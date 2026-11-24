@@ -1,0 +1,807 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080d19">
+<title>DemonScope | Geometry Dash Level Explorer</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --bg: #080d19;
+  --panel: #101a2d;
+  --panel2: #14213a;
+  --blue: #26baff;
+  --cyan: #75e7ff;
+  --text: #eef7ff;
+  --muted: #91a6c1;
+  --border: rgba(91,181,255,.17);
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(ellipse at 50% -20%, rgba(0,137,255,.19), transparent 55%),
+    var(--bg);
+  color: var(--text);
+  font-family: Inter, Arial, sans-serif;
+}
+
+button, input, select { font: inherit; }
+
+button { cursor: pointer; }
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(8,13,25,.88);
+  backdrop-filter: blur(15px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav {
+  max-width: 1150px;
+  margin: auto;
+  padding: 17px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.logo {
+  font-family: Orbitron, sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: white;
+}
+
+.logo span { color: var(--blue); }
+
+.nav-links {
+  display: flex;
+  gap: 25px;
+}
+
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+  transition: .2s;
+}
+
+.nav-links a:hover { color: var(--cyan); }
+
+.hero {
+  max-width: 1150px;
+  margin: auto;
+  padding: 95px 22px 75px;
+  text-align: center;
+}
+
+.tag {
+  display: inline-block;
+  border: 1px solid rgba(38,186,255,.4);
+  background: rgba(38,186,255,.08);
+  color: var(--cyan);
+  border-radius: 30px;
+  padding: 8px 14px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.hero h1 {
+  font-family: Orbitron, sans-serif;
+  font-size: clamp(39px, 8vw, 76px);
+  line-height: 1.12;
+  margin: 23px 0 15px;
+  letter-spacing: -3px;
+}
+
+.hero h1 span {
+  color: var(--blue);
+  text-shadow: 0 0 30px rgba(38,186,255,.5);
+}
+
+.hero p {
+  color: var(--muted);
+  max-width: 590px;
+  margin: 0 auto;
+  line-height: 1.8;
+  font-size: 15px;
+}
+
+.hero-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.btn {
+  border: 1px solid var(--blue);
+  border-radius: 8px;
+  padding: 13px 21px;
+  font-weight: 800;
+  font-size: 13px;
+  text-decoration: none;
+  transition: .2s;
+}
+
+.btn-primary {
+  color: #03101b;
+  background: var(--blue);
+  box-shadow: 0 0 22px rgba(38,186,255,.22);
+}
+
+.btn-primary:hover { transform: translateY(-3px); }
+
+.btn-secondary {
+  color: var(--cyan);
+  background: transparent;
+}
+
+.btn-secondary:hover { background: rgba(38,186,255,.1); }
+
+.stats {
+  max-width: 850px;
+  margin: 0 auto 75px;
+  padding: 0 22px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 13px;
+}
+
+.stat {
+  background: linear-gradient(145deg, #14233c, #0d1628);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 21px 12px;
+  text-align: center;
+}
+
+.stat strong {
+  display: block;
+  font-family: Orbitron, sans-serif;
+  color: var(--cyan);
+  font-size: 24px;
+}
+
+.stat small {
+  display: block;
+  color: var(--muted);
+  margin-top: 7px;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  font-weight: 800;
+}
+
+section.content {
+  max-width: 1150px;
+  margin: auto;
+  padding: 20px 22px 75px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 24px;
+}
+
+.eyebrow {
+  color: var(--blue);
+  font-size: 10px;
+  letter-spacing: 2px;
+  font-weight: 800;
+}
+
+h2 {
+  font-family: Orbitron, sans-serif;
+  font-size: clamp(23px, 4vw, 31px);
+  margin: 9px 0 0;
+}
+
+.section-heading p {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 0;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.filters input, .filters select {
+  width: 100%;
+  color: var(--text);
+  background: #101b30;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  outline: none;
+}
+
+.filters input:focus, .filters select:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(38,186,255,.1);
+}
+
+.filters select option { background: #101b30; }
+
+.level-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 17px;
+}
+
+.level-card {
+  overflow: hidden;
+  background: linear-gradient(145deg, #14223a, #0d1729);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  transition: .25s;
+  cursor: pointer;
+}
+
+.level-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(38,186,255,.7);
+  box-shadow: 0 12px 35px rgba(0,0,0,.25);
+}
+
+.level-art {
+  height: 145px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(0,0,0,.1), rgba(0,0,0,.65)),
+    repeating-linear-gradient(45deg, transparent 0 18px, rgba(255,255,255,.04) 19px 20px),
+    var(--art, #123d65);
+}
+
+.level-art::before {
+  content: "";
+  width: 90px;
+  height: 90px;
+  border: 3px solid rgba(255,255,255,.65);
+  box-shadow: 0 0 25px rgba(255,255,255,.25);
+  transform: rotate(45deg);
+}
+
+.level-art::after {
+  content: "";
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  border: 1px solid rgba(255,255,255,.15);
+  transform: rotate(45deg);
+}
+
+.level-art span {
+  position: absolute;
+  bottom: 12px;
+  left: 14px;
+  font-family: Orbitron, sans-serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: white;
+  z-index: 1;
+}
+
+.card-body { padding: 17px; }
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.card-top h3 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.difficulty {
+  color: #ff7272;
+  background: rgba(255,91,91,.1);
+  border: 1px solid rgba(255,91,91,.25);
+  padding: 5px 8px;
+  border-radius: 5px;
+  font-size: 9px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.card-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 13px;
+}
+
+.meta {
+  color: var(--muted);
+  background: rgba(255,255,255,.05);
+  border-radius: 5px;
+  padding: 6px 8px;
+  font-size: 10px;
+}
+
+.creator {
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 13px;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 17px;
+  padding-top: 13px;
+  border-top: 1px solid var(--border);
+}
+
+.card-footer span {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.view-link {
+  color: var(--cyan);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.empty {
+  display: none;
+  text-align: center;
+  padding: 45px 15px;
+  color: var(--muted);
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.info-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 22px;
+}
+
+.info-card .symbol {
+  font-size: 25px;
+  color: var(--cyan);
+}
+
+.info-card h3 { font-size: 15px; }
+
+.info-card p {
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+
+.notice {
+  margin-top: 25px;
+  padding: 15px 17px;
+  border-left: 3px solid var(--blue);
+  background: rgba(38,186,255,.06);
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.8;
+  border-radius: 4px;
+}
+
+footer {
+  border-top: 1px solid var(--border);
+  padding: 28px 22px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.8;
+}
+
+footer strong { color: var(--cyan); }
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(0,0,0,.78);
+  backdrop-filter: blur(8px);
+}
+
+.modal.open { display: flex; }
+
+.modal-box {
+  width: 100%;
+  max-width: 490px;
+  background: #101b30;
+  border: 1px solid rgba(38,186,255,.4);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 20px 80px rgba(0,0,0,.6);
+  animation: appear .2s ease;
+}
+
+@keyframes appear {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-art {
+  height: 160px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #075078, #101b30);
+}
+
+.modal-art span {
+  font-family: Orbitron, sans-serif;
+  font-size: 35px;
+  color: white;
+  text-shadow: 0 0 25px var(--cyan);
+}
+
+.modal-content { padding: 22px; }
+
+.modal-content h2 { font-size: 22px; }
+
+.modal-content p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.close {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 7px;
+}
+
+@media(max-width: 800px) {
+  .level-grid { grid-template-columns: repeat(2, 1fr); }
+  .info-grid { grid-template-columns: 1fr; }
+}
+
+@media(max-width: 560px) {
+  .nav { padding: 15px; }
+  .logo { font-size: 18px; }
+  .nav-links { gap: 12px; }
+  .nav-links a { font-size: 10px; }
+  .hero { padding-top: 70px; }
+  .stats { gap: 7px; }
+  .stat strong { font-size: 19px; }
+  .stat small { font-size: 8px; }
+  .filters { grid-template-columns: 1fr; }
+  .level-grid { grid-template-columns: 1fr; }
+  .section-heading { align-items: start; flex-direction: column; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <nav class="nav">
+    <div class="logo">DEMON<span>SCOPE</span></div>
+    <div class="nav-links">
+      <a href="#levels">LEVELS</a>
+      <a href="#about">ABOUT</a>
+      <a href="#how">HOW IT WORKS</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="tag">THE GEOMETRY DASH LEVEL EXPLORER</div>
+    <h1>ENTER THE <span>DEMON</span><br>ZONE.</h1>
+    <p>
+      Discover levels, explore difficulties and find your next challenge.
+      Welcome to DemonScope, your gateway into the Geometry Dash universe.
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#levels">EXPLORE LEVELS ↗</a>
+      <a class="btn btn-secondary" href="#about">DISCOVER DEMONS</a>
+    </div>
+  </section>
+
+  <div class="stats">
+    <div class="stat">
+      <strong>∞</strong>
+      <small>LEVEL POSSIBILITIES</small>
+    </div>
+    <div class="stat">
+      <strong>10</strong>
+      <small>DIFFICULTY TIERS</small>
+    </div>
+    <div class="stat">
+      <strong>GD</strong>
+      <small>COMMUNITY POWERED</small>
+    </div>
+  </div>
+
+  <section class="content" id="levels">
+    <div class="section-heading">
+      <div>
+        <div class="eyebrow">THE LEVEL DATABASE</div>
+        <h2>EXPLORE LEVELS</h2>
+      </div>
+      <p>Find your next challenge.</p>
+    </div>
+
+    <div class="filters">
+      <input id="search" type="search" placeholder="Search levels or creators...">
+
+      <select id="difficulty">
+        <option value="all">All difficulties</option>
+        <option value="Easy Demon">Easy Demon</option>
+        <option value="Medium Demon">Medium Demon</option>
+        <option value="Hard Demon">Hard Demon</option>
+        <option value="Insane Demon">Insane Demon</option>
+        <option value="Extreme Demon">Extreme Demon</option>
+      </select>
+
+      <select id="length">
+        <option value="all">All lengths</option>
+        <option value="Short">Short</option>
+        <option value="Medium">Medium</option>
+        <option value="Long">Long</option>
+        <option value="XL">XL</option>
+      </select>
+    </div>
+
+    <div class="level-grid" id="levelGrid"></div>
+
+    <div class="empty" id="empty">
+      <h3>NO LEVELS FOUND</h3>
+      <p>Try another search or change your filters.</p>
+    </div>
+
+    <div class="notice">
+      <strong>Database notice:</strong> The levels currently displayed are starter examples.
+      Their creator details, difficulty labels and length categories should be checked
+      before treating them as verified database information.
+    </div>
+  </section>
+
+  <section class="content" id="about">
+    <div class="eyebrow">WHAT IS DEMONSCOPE?</div>
+    <h2>MORE THAN JUST A GAME.</h2>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="symbol">◈</div>
+        <h3>DISCOVER</h3>
+        <p>Explore Geometry Dash levels and discover challenges across different demon difficulties.</p>
+      </div>
+
+      <div class="info-card">
+        <div class="symbol">⌕</div>
+        <h3>SEARCH</h3>
+        <p>Use the search bar and filters to narrow down your choices by difficulty and level length.</p>
+      </div>
+
+      <div class="info-card">
+        <div class="symbol">▣</div>
+        <h3>SHOWCASE</h3>
+        <p>Open a level card to view its showcase information in a dedicated popup.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="content" id="how">
+    <div class="eyebrow">GETTING STARTED</div>
+    <h2>HOW IT WORKS</h2>
+    <div class="notice">
+      <strong>01 — Search:</strong> Enter a level name or creator.<br>
+      <strong>02 — Filter:</strong> Choose a demon difficulty or length.<br>
+      <strong>03 — Explore:</strong> Click any level card to open its showcase.<br>
+      <strong>04 — Discover:</strong> Find your next Geometry Dash challenge.
+    </div>
+  </section>
+</main>
+
+<div class="modal" id="levelModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-box">
+    <div class="modal-art">
+      <span>DEMONSCOPE</span>
+    </div>
+    <div class="modal-content">
+      <div class="eyebrow">LEVEL SHOWCASE</div>
+      <h2 id="modalTitle">Level name</h2>
+      <p id="modalDescription"></p>
+      <div class="card-meta" id="modalMeta"></div>
+      <div class="modal-actions">
+        <button class="close" id="closeModal">CLOSE</button>
+        <a class="btn btn-primary" href="https://www.robtopgames.com/" target="_blank" rel="noopener">GEOMETRY DASH ↗</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="logo">DEMON<span>SCOPE</span></div>
+  <p>Built for the Geometry Dash community.</p>
+  <p>Fan-made project. Not affiliated with RobTop Games.</p>
+  <strong>SMKBO11 © 2026</strong>
+</footer>
+
+<script>
+const levels = [
+  {
+    name: "Jawbreaker",
+    creator: "ZenthicAlpha",
+    difficulty: "Hard Demon",
+    length: "Long",
+    description: "A classic wave-focused demon challenge. A starter entry for the DemonScope showcase.",
+    color: "#174b83"
+  },
+  {
+    name: "Clubstep",
+    creator: "RobTop",
+    difficulty: "Easy Demon",
+    length: "Long",
+    description: "One of Geometry Dash's original official demon levels.",
+    color: "#8b292d"
+  },
+  {
+    name: "Theory of Everything 2",
+    creator: "RobTop",
+    difficulty: "Easy Demon",
+    length: "Long",
+    description: "An official demon level with a memorable soundtrack and varied gameplay.",
+    color: "#57338b"
+  }
+];
+
+const grid = document.getElementById("levelGrid");
+const search = document.getElementById("search");
+const difficulty = document.getElementById("difficulty");
+const length = document.getElementById("length");
+const empty = document.getElementById("empty");
+const modal = document.getElementById("levelModal");
+
+function renderLevels() {
+  const term = search.value.toLowerCase().trim();
+  const selectedDifficulty = difficulty.value;
+  const selectedLength = length.value;
+
+  const filtered = levels.filter(level => {
+    const matchesSearch =
+      level.name.toLowerCase().includes(term) ||
+      level.creator.toLowerCase().includes(term);
+
+    const matchesDifficulty =
+      selectedDifficulty === "all" ||
+      level.difficulty === selectedDifficulty;
+
+    const matchesLength =
+      selectedLength === "all" ||
+      level.length === selectedLength;
+
+    return matchesSearch && matchesDifficulty && matchesLength;
+  });
+
+  grid.innerHTML = "";
+
+  filtered.forEach((level, index) => {
+    const card = document.createElement("article");
+    card.className = "level-card";
+    card.tabIndex = 0;
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-label", "Open " + level.name + " showcase");
+
+    card.innerHTML = `
+      <div class="level-art" style="--art:${level.color}">
+        <span>LEVEL ${String(index + 1).padStart(2, "0")}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <h3>${level.name}</h3>
+          <span class="difficulty">${level.difficulty}</span>
+        </div>
+        <div class="card-meta">
+          <span class="meta">◈ ${level.length}</span>
+          <span class="meta">Geometry Dash</span>
+        </div>
+        <div class="creator">CREATOR: ${level.creator}</div>
+        <div class="card-footer">
+          <span>LEVEL SHOWCASE</span>
+          <span class="view-link">VIEW DETAILS ↗</span>
+        </div>
+      </div>
+    `;
+
+    card.addEventListener("click", () => openShowcase(level));
+    card.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openShowcase(level);
+      }
+    });
+
+    grid.appendChild(card);
+  });
+
+  empty.style.display = filtered.length ? "none" : "block";
+}
+
+function openShowcase(level) {
+  document.getElementById("modalTitle").textContent = level.name;
+  document.getElementById("modalDescription").textContent = level.description;
+  document.getElementById("modalMeta").innerHTML = `
+    <span class="meta">Difficulty: ${level.difficulty}</span>
+    <span class="meta">Length: ${level.length}</span>
+    <span class="meta">Creator: ${level.creator}</span>
+  `;
+  modal.classList.add("open");
+  document.getElementById("closeModal").focus();
+}
+
+function closeShowcase() {
+  modal.classList.remove("open");
+}
+
+search.addEventListener("input", renderLevels);
+difficulty.addEventListener("change", renderLevels);
+length.addEventListener("change", renderLevels);
+document.getElementById("closeModal").addEventListener("click", closeShowcase);
+
+modal.addEventListener("click", event => {
+  if (event.target === modal) closeShowcase();
+});
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") closeShowcase();
+});
+
+renderLevels();
+</script>
+
+</body>
+</html>
