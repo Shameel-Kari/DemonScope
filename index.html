@@ -1,807 +1,390 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#080d19">
-<title>DemonScope | Geometry Dash Level Explorer</title>
-
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DemonScope — Scan. Rank. Conquer.</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
+:root{--bg:#050d14;--panel:#0a1a26;--line:#14344a;--blue:#38b6ff;--green:#39ff88;--text:#e8f1fa;--dim:#8ba3b8;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 70px);scroll-behavior:smooth}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;color:var(--text);font:400 1rem/1.6 Inter,system-ui,sans-serif;background:radial-gradient(900px 400px at 15% -5%,rgba(56,182,255,.14),transparent),radial-gradient(700px 400px at 90% 0,rgba(57,255,136,.1),transparent),var(--bg)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:20;background:rgba(5,13,20,.92)}
+h1,h2,.hd{font-family:"Space Grotesk",system-ui,sans-serif;font-weight:700;margin:0}
+a{color:var(--blue)}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(5,13,20,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.bar-in{max-width:960px;margin:0 auto;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.logo{font-family:"Space Grotesk",system-ui,sans-serif;font-weight:700;font-size:1.2rem;color:var(--text);text-decoration:none}
+.logo b{color:var(--green)}
+nav{display:flex;gap:18px}
+nav a{color:var(--dim);text-decoration:none;font-weight:500;font-size:.95rem}
+nav a:hover{color:var(--text)}
+nav a.creator-nav{color:#ffb547}nav a.creator-nav:hover{color:#ffd27a;text-shadow:0 0 12px rgba(255,181,71,.35)}
+main{max-width:960px;margin:0 auto;padding:0 20px}
+.hero{padding:56px 0 8px}
+h1{font-size:clamp(2.2rem,7vw,3.6rem);line-height:1.08;letter-spacing:-.02em}
+h1 em{font-style:normal;background:linear-gradient(90deg,var(--blue),var(--green));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{color:var(--dim);max-width:52ch;margin:14px 0 0;font-size:1.1rem}
+.note{margin:18px 0 0;padding:10px 14px;border:1px dashed var(--line);border-radius:8px;color:var(--dim);font-size:.9rem}
+.tiers{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:26px}
+.tc{padding:14px;background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--t);border-radius:8px}
+.tc b{display:block;font-family:"Space Grotesk",system-ui,sans-serif;font-size:1.7rem;line-height:1.1}
+.tc span{color:var(--dim);font-size:.85rem}
+.controls{margin-top:44px;display:grid;gap:12px}
+.row2{display:flex;flex-wrap:wrap;gap:10px}
+input,select{font:inherit;color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+input{flex:1;min-width:180px}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+button{font:inherit;font-weight:500;color:var(--dim);background:transparent;border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer}
+button:hover{color:var(--text)}
+button[aria-pressed=true]{color:var(--bg);background:var(--green);border-color:var(--green)}
+.tabs button{border-radius:8px}
+.tabs button[aria-pressed=true]{background:var(--blue);border-color:var(--blue)}
+#blurb{color:var(--dim);margin:14px 0 0;font-size:.95rem}
+#count{color:var(--dim);font-size:.85rem;margin:6px 0 0}
+ol{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:8px}
+.item{display:grid;grid-template-columns:48px 1fr auto;gap:4px 14px;align-items:center;padding:14px 16px;background:var(--panel);border:1px solid var(--line);border-radius:10px}
+.item:hover{border-color:var(--blue)}.item{cursor:pointer}.item:focus-visible{outline:2px solid var(--blue;)}
+.rk{font-family:"Space Grotesk",system-ui,sans-serif;font-weight:700;font-size:1.4rem;color:var(--dim);text-align:center}
+.item:nth-child(-n+3) .rk{color:var(--green)}
+.nm{font-family:"Space Grotesk",system-ui,sans-serif;font-weight:700;font-size:1.1rem;line-height:1.25}
+.meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;color:var(--dim);font-size:.85rem;margin-top:2px}
+.pill{padding:1px 9px;border-radius:999px;border:1px solid var(--t);color:var(--t);font-weight:600;font-size:.78rem}
+.val{font-family:"Space Grotesk",system-ui,sans-serif;font-weight:700;font-size:1.3rem;text-align:right}
+.bar{grid-column:2/4;height:4px;background:var(--bg);border-radius:2px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--green))}
+.empty{padding:28px;text-align:center;color:var(--dim);border:1px dashed var(--line);border-radius:10px}
+section{padding-top:64px}
+h2{font-size:1.7rem;margin-bottom:14px}
+.defs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.def{padding:16px;background:var(--panel);border:1px solid var(--line);border-radius:10px}
+.def h3{font-family:"Space Grotesk",system-ui,sans-serif;margin:0 0 4px;color:var(--blue);font-size:1.05rem}
+.def p{margin:0;color:var(--dim);font-size:.93rem}
+footer{max-width:960px;margin:64px auto 0;padding:24px 20px 40px;color:var(--dim);font-size:.9rem;border-top:1px solid var(--line)}
+button.tc{border-radius:8px;text-align:left;color:var(--text);padding:14px;border:1px solid var(--line);border-top:3px solid var(--t);background:var(--panel)}
+button.tc.on{border-color:var(--t);box-shadow:0 0 14px -4px var(--t)}
+button:disabled{opacity:.4;cursor:default}
+.pager{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;margin-top:18px}
+
+
+/* DemonScope Creators — amber prestige theme */
+.creator-intro{color:var(--dim);max-width:65ch;margin:-4px 0 18px}
+.creator-controls{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+.creator-controls input{min-width:200px}
+.creator-wrap{overflow-x:auto;border:1px solid #68461c;border-radius:12px;background:var(--panel)}
+.creator-table{width:100%;border-collapse:collapse;min-width:700px}
+.creator-table th,.creator-table td{text-align:left;padding:13px 14px;border-bottom:1px solid #352819}
+.creator-table th{color:#c9a56b;font-size:.82rem;white-space:nowrap}
+.creator-table tr:last-child td{border-bottom:0}.creator-table tbody tr:hover{background:rgba(255,181,71,.06)}
+.creator-rank{font-family:Space Grotesk,sans-serif;font-weight:700;font-size:1.2rem;color:#b89a69}
+.creator-rank.c1{color:#ffd76a}.creator-rank.c2{color:#d6d2ca}.creator-rank.c3{color:#d6a078}
+.creator-name{border:0;background:none;padding:0;border-radius:0;color:#ffb547;font-weight:700;text-align:left}.creator-name:hover{color:#ffd27a;text-decoration:underline}
+.creator-stat{font-weight:700;color:#ffb547}.creator-hardest{font-weight:600}.creator-badge{display:inline-block;border:1px solid #76501e;color:#ffcf76;background:rgba(255,181,71,.08);border-radius:999px;padding:2px 8px;font-size:.75rem}
+.creator-modal{position:fixed;inset:0;z-index:101;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.72)}.creator-modal.open{display:flex}
+.creator-card{width:min(680px,100%);max-height:90vh;overflow:auto;background:var(--panel);border:1px solid #8a6025;border-radius:16px;padding:20px;box-shadow:0 20px 80px rgba(255,181,71,.08)}
+.creator-head{display:flex;justify-content:space-between;align-items:start;gap:12px}.creator-head h3{font-family:Space Grotesk,sans-serif;margin:0;font-size:1.5rem;color:#ffb547}
+.creator-profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}.creator-profile-stat{padding:12px;border:1px solid #49351b;border-radius:10px;background:var(--bg)}.creator-profile-stat small{display:block;color:var(--dim)}.creator-profile-stat strong{font-family:Space Grotesk,sans-serif;font-size:1.25rem;color:#ffb547}
+.creator-subtitle{margin:16px 0 6px;font-family:Space Grotesk,sans-serif;color:#ffb547}.creator-list{padding-left:20px;color:var(--dim)}.creator-list li{margin:5px 0}
+@media(max-width:640px){.creator-profile-stats{grid-template-columns:1fr 1fr}.creator-card{padding:16px}}
+
+/* DemonScope Players leaderboard */
+.players-intro{color:var(--dim);max-width:65ch;margin:-4px 0 18px}
+.player-controls{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+.player-controls select{min-width:210px}
+.player-table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+.player-table{width:100%;border-collapse:collapse;min-width:720px}
+.player-table th,.player-table td{text-align:left;padding:13px 14px;border-bottom:1px solid var(--line)}
+.player-table th{color:var(--dim);font-size:.82rem;font-weight:600;white-space:nowrap}
+.player-table tr:last-child td{border-bottom:0}
+.player-table tbody tr:hover{background:rgba(56,182,255,.06)}
+.player-rank{font-family:"Space Grotesk",sans-serif;font-size:1.2rem;font-weight:700;color:var(--dim)}
+.player-rank.top1{color:#f5cf72}.player-rank.top2{color:#cbd5e1}.player-rank.top3{color:#d6a078}
+.player-name-btn{border:0;border-radius:0;padding:0;color:var(--text);font-weight:700;background:none;text-align:left}
+.player-name-btn:hover{color:var(--blue);text-decoration:underline}
+.player-count{font-family:"Space Grotesk",sans-serif;font-weight:700;color:var(--green);font-size:1.1rem}
+.player-hardest{font-weight:600}.player-points{color:var(--blue);font-weight:700}
+.player-movement{font-weight:700;color:var(--green)}.player-movement.down{color:#ff8a8a}.player-movement.new{color:#b69cff}
+.player-mini{color:var(--dim);font-size:.83rem}.player-badge{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid var(--line);font-size:.75rem;color:var(--dim)}
+.player-notice{margin:12px 0 0;border:1px dashed var(--line);border-radius:9px;padding:10px 12px;color:var(--dim);font-size:.85rem}
+.player-modal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.72)}
+.player-modal.open{display:flex}.player-modal-card{width:min(680px,100%);max-height:90vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 20px 80px rgba(0,0,0,.5)}
+.player-modal-head{display:flex;justify-content:space-between;align-items:start;gap:12px}.player-modal-head h3{font-family:"Space Grotesk",sans-serif;margin:0;font-size:1.5rem}
+.player-modal-close{color:var(--text);font-size:1.25rem}.player-profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+.player-stat{padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}.player-stat small{display:block;color:var(--dim)}.player-stat strong{font-family:"Space Grotesk",sans-serif;font-size:1.3rem}
+.player-profile-list{padding-left:20px;color:var(--dim)}.player-profile-list li{margin:5px 0}.player-profile-subtitle{margin:16px 0 6px;font-family:"Space Grotesk",sans-serif;color:var(--blue)}
+@media(max-width:640px){.player-profile-stats{grid-template-columns:1fr 1fr}.player-modal-card{padding:16px}}
 
-:root {
-  --bg: #080d19;
-  --panel: #101a2d;
-  --panel2: #14213a;
-  --blue: #26baff;
-  --cyan: #75e7ff;
-  --text: #eef7ff;
-  --muted: #91a6c1;
-  --border: rgba(91,181,255,.17);
-}
 
-* { box-sizing: border-box; }
+/* DemonScope hub polish */
+.logo{display:flex;flex-direction:column;line-height:1.05}.logo small{font-size:.58rem;letter-spacing:.16em;color:var(--dim);margin-top:4px}.bar-in{max-width:1180px}main{max-width:1180px}.hero{padding-top:48px}.eyebrow{font-size:.72rem;letter-spacing:.2em;color:var(--blue);font-weight:700;margin-bottom:10px}.hub-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:18px 0}.hub-card{background:linear-gradient(145deg,var(--panel),#07121b);border:1px solid var(--line);border-radius:12px;padding:16px;transition:transform .18s,border-color .18s}.hub-card:hover{transform:translateY(-3px);border-color:var(--blue)}.hub-card h3{margin:0 0 6px;font-family:Space Grotesk,sans-serif}.hub-card p{margin:0;color:var(--dim);font-size:.9rem}.hub-card a{display:inline-block;margin-top:12px;text-decoration:none;font-weight:700}.spotlight{border-color:#76501e;background:radial-gradient(400px 160px at 0 0,rgba(255,181,71,.12),transparent),var(--panel)}.spotlight h3,.creator-hub-title{color:#ffb547}.directory-tools{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}.directory-tools input{min-width:210px}.directory-tools button[aria-pressed=true]{background:#ffb547;border-color:#ffb547;color:#101010}.creator-directory{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}.creator-tile{padding:15px;border-radius:11px;background:var(--panel);border:1px solid #49351b;cursor:pointer;transition:.18s}.creator-tile:hover{transform:translateY(-2px);border-color:#ffb547;box-shadow:0 0 20px rgba(255,181,71,.08)}.creator-tile strong{display:block;color:#ffb547;font-family:Space Grotesk,sans-serif;font-size:1.08rem}.creator-tile small{color:var(--dim)}.creator-tile .tile-tags{margin-top:9px;display:flex;flex-wrap:wrap;gap:5px}.creator-style-grid,.achievement-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}.style-chip,.achievement-card{border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:14px}.style-chip strong,.achievement-card strong{display:block;margin-bottom:4px}.style-chip span,.achievement-card p{color:var(--dim);font-size:.88rem;margin:0}.achievement-card{border-color:#76501e}.achievement-card strong{color:#ffd76a}.subsection{padding-top:26px!important}.section-kicker{font-size:.75rem;letter-spacing:.12em;color:var(--dim);text-transform:uppercase;margin-bottom:8px}@media(max-width:760px){.bar-in{align-items:flex-start;flex-direction:column}.bar-in nav{width:100%;overflow-x:auto;padding-bottom:3px}.bar-in nav a{white-space:nowrap}.hero{padding-top:32px}}
 
-html { scroll-behavior: smooth; }
+@media(max-width:640px){nav{gap:12px}.tiers{grid-template-columns:repeat(2,1fr)}.tc:last-child{grid-column:1/-1}}
 
-body {
-  margin: 0;
-  background:
-    radial-gradient(ellipse at 50% -20%, rgba(0,137,255,.19), transparent 55%),
-    var(--bg);
-  color: var(--text);
-  font-family: Inter, Arial, sans-serif;
-}
+.level-modal{position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.76)}.level-modal.open{display:flex}.level-modal-card{width:min(760px,100%);max-height:92vh;overflow:auto;padding:22px;background:var(--panel);border:1px solid var(--blue);border-radius:16px;box-shadow:0 20px 80px rgba(56,182,255,.12);position:relative}.level-modal-close{float:right;color:var(--text);font-size:1.2rem}.level-kicker{font-size:.72rem;letter-spacing:.16em;color:var(--blue);font-weight:700}.level-modal-card h2{font-size:clamp(1.6rem,5vw,2.4rem);margin:6px 0}.level-byline{color:var(--dim)}.level-preview{display:flex;gap:16px;align-items:center;padding:20px;border:1px solid var(--line);border-radius:12px;background:linear-gradient(135deg,rgba(56,182,255,.12),rgba(57,255,136,.05));margin:18px 0}.preview-icon{font-size:3rem;color:var(--blue)}.level-preview p{color:var(--dim);margin:4px 0 8px}.level-stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:9px}.level-stat-grid>div{padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}.level-stat-grid small{display:block;color:var(--dim)}.level-stat-grid strong{display:block;font-family:Space Grotesk,sans-serif;font-size:1.12rem;margin-top:4px}.level-modal-note,.request-hint{color:var(--dim);font-size:.88rem}.level-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}.level-action{display:inline-block;text-decoration:none;border:1px solid var(--line);padding:9px 13px;border-radius:9px;color:var(--text);background:var(--bg);font:inherit;cursor:pointer}.level-action:hover{border-color:var(--blue)}.request-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:18px;border:1px solid var(--line);background:var(--panel);border-radius:12px}.request-form label{display:grid;gap:6px;color:var(--dim);font-size:.9rem}.request-form input,.request-form select,.request-form textarea{width:100%;min-width:0}.request-form label:nth-last-of-type(1){grid-column:1/-1}.request-submit{grid-column:1/-1;background:var(--blue);border-color:var(--blue);color:#05111a;border-radius:9px;font-weight:700;padding:12px}.request-hint{grid-column:1/-1;margin:0}@media(max-width:600px){.level-modal-card{padding:16px}.request-form{grid-template-columns:1fr}.request-form label:nth-last-of-type(1){grid-column:auto}}
 
-button, input, select { font: inherit; }
-
-button { cursor: pointer; }
-
-header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: rgba(8,13,25,.88);
-  backdrop-filter: blur(15px);
-  border-bottom: 1px solid var(--border);
-}
-
-.nav {
-  max-width: 1150px;
-  margin: auto;
-  padding: 17px 22px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-}
-
-.logo {
-  font-family: Orbitron, sans-serif;
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: 1px;
-  color: white;
-}
-
-.logo span { color: var(--blue); }
-
-.nav-links {
-  display: flex;
-  gap: 25px;
-}
-
-.nav-links a {
-  color: var(--muted);
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 700;
-  transition: .2s;
-}
-
-.nav-links a:hover { color: var(--cyan); }
-
-.hero {
-  max-width: 1150px;
-  margin: auto;
-  padding: 95px 22px 75px;
-  text-align: center;
-}
-
-.tag {
-  display: inline-block;
-  border: 1px solid rgba(38,186,255,.4);
-  background: rgba(38,186,255,.08);
-  color: var(--cyan);
-  border-radius: 30px;
-  padding: 8px 14px;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 2px;
-}
-
-.hero h1 {
-  font-family: Orbitron, sans-serif;
-  font-size: clamp(39px, 8vw, 76px);
-  line-height: 1.12;
-  margin: 23px 0 15px;
-  letter-spacing: -3px;
-}
-
-.hero h1 span {
-  color: var(--blue);
-  text-shadow: 0 0 30px rgba(38,186,255,.5);
-}
-
-.hero p {
-  color: var(--muted);
-  max-width: 590px;
-  margin: 0 auto;
-  line-height: 1.8;
-  font-size: 15px;
-}
-
-.hero-actions {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 30px;
-}
-
-.btn {
-  border: 1px solid var(--blue);
-  border-radius: 8px;
-  padding: 13px 21px;
-  font-weight: 800;
-  font-size: 13px;
-  text-decoration: none;
-  transition: .2s;
-}
-
-.btn-primary {
-  color: #03101b;
-  background: var(--blue);
-  box-shadow: 0 0 22px rgba(38,186,255,.22);
-}
-
-.btn-primary:hover { transform: translateY(-3px); }
-
-.btn-secondary {
-  color: var(--cyan);
-  background: transparent;
-}
-
-.btn-secondary:hover { background: rgba(38,186,255,.1); }
-
-.stats {
-  max-width: 850px;
-  margin: 0 auto 75px;
-  padding: 0 22px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 13px;
-}
-
-.stat {
-  background: linear-gradient(145deg, #14233c, #0d1628);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 21px 12px;
-  text-align: center;
-}
-
-.stat strong {
-  display: block;
-  font-family: Orbitron, sans-serif;
-  color: var(--cyan);
-  font-size: 24px;
-}
-
-.stat small {
-  display: block;
-  color: var(--muted);
-  margin-top: 7px;
-  font-size: 10px;
-  letter-spacing: 1.5px;
-  font-weight: 800;
-}
-
-section.content {
-  max-width: 1150px;
-  margin: auto;
-  padding: 20px 22px 75px;
-}
-
-.section-heading {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 15px;
-  margin-bottom: 24px;
-}
-
-.eyebrow {
-  color: var(--blue);
-  font-size: 10px;
-  letter-spacing: 2px;
-  font-weight: 800;
-}
-
-h2 {
-  font-family: Orbitron, sans-serif;
-  font-size: clamp(23px, 4vw, 31px);
-  margin: 9px 0 0;
-}
-
-.section-heading p {
-  color: var(--muted);
-  font-size: 12px;
-  margin: 0;
-}
-
-.filters {
-  display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 25px;
-}
-
-.filters input, .filters select {
-  width: 100%;
-  color: var(--text);
-  background: #101b30;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 14px;
-  outline: none;
-}
-
-.filters input:focus, .filters select:focus {
-  border-color: var(--blue);
-  box-shadow: 0 0 0 3px rgba(38,186,255,.1);
-}
-
-.filters select option { background: #101b30; }
-
-.level-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 17px;
-}
-
-.level-card {
-  overflow: hidden;
-  background: linear-gradient(145deg, #14223a, #0d1729);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  transition: .25s;
-  cursor: pointer;
-}
-
-.level-card:hover {
-  transform: translateY(-5px);
-  border-color: rgba(38,186,255,.7);
-  box-shadow: 0 12px 35px rgba(0,0,0,.25);
-}
-
-.level-art {
-  height: 145px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-  background:
-    linear-gradient(135deg, rgba(0,0,0,.1), rgba(0,0,0,.65)),
-    repeating-linear-gradient(45deg, transparent 0 18px, rgba(255,255,255,.04) 19px 20px),
-    var(--art, #123d65);
-}
-
-.level-art::before {
-  content: "";
-  width: 90px;
-  height: 90px;
-  border: 3px solid rgba(255,255,255,.65);
-  box-shadow: 0 0 25px rgba(255,255,255,.25);
-  transform: rotate(45deg);
-}
-
-.level-art::after {
-  content: "";
-  position: absolute;
-  width: 160px;
-  height: 160px;
-  border: 1px solid rgba(255,255,255,.15);
-  transform: rotate(45deg);
-}
-
-.level-art span {
-  position: absolute;
-  bottom: 12px;
-  left: 14px;
-  font-family: Orbitron, sans-serif;
-  font-size: 10px;
-  letter-spacing: 2px;
-  color: white;
-  z-index: 1;
-}
-
-.card-body { padding: 17px; }
-
-.card-top {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  align-items: center;
-}
-
-.card-top h3 {
-  margin: 0;
-  font-size: 17px;
-}
-
-.difficulty {
-  color: #ff7272;
-  background: rgba(255,91,91,.1);
-  border: 1px solid rgba(255,91,91,.25);
-  padding: 5px 8px;
-  border-radius: 5px;
-  font-size: 9px;
-  font-weight: 800;
-  white-space: nowrap;
-}
-
-.card-meta {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 13px;
-}
-
-.meta {
-  color: var(--muted);
-  background: rgba(255,255,255,.05);
-  border-radius: 5px;
-  padding: 6px 8px;
-  font-size: 10px;
-}
-
-.creator {
-  color: var(--muted);
-  font-size: 11px;
-  margin-top: 13px;
-}
-
-.card-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 17px;
-  padding-top: 13px;
-  border-top: 1px solid var(--border);
-}
-
-.card-footer span {
-  font-size: 10px;
-  color: var(--muted);
-}
-
-.view-link {
-  color: var(--cyan);
-  font-size: 11px;
-  font-weight: 800;
-}
-
-.empty {
-  display: none;
-  text-align: center;
-  padding: 45px 15px;
-  color: var(--muted);
-  border: 1px dashed var(--border);
-  border-radius: 12px;
-}
-
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
-  margin-top: 25px;
-}
-
-.info-card {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 22px;
-}
-
-.info-card .symbol {
-  font-size: 25px;
-  color: var(--cyan);
-}
-
-.info-card h3 { font-size: 15px; }
-
-.info-card p {
-  font-size: 12px;
-  line-height: 1.8;
-  color: var(--muted);
-}
-
-.notice {
-  margin-top: 25px;
-  padding: 15px 17px;
-  border-left: 3px solid var(--blue);
-  background: rgba(38,186,255,.06);
-  color: var(--muted);
-  font-size: 11px;
-  line-height: 1.8;
-  border-radius: 4px;
-}
-
-footer {
-  border-top: 1px solid var(--border);
-  padding: 28px 22px;
-  text-align: center;
-  color: var(--muted);
-  font-size: 11px;
-  line-height: 1.8;
-}
-
-footer strong { color: var(--cyan); }
-
-.modal {
-  position: fixed;
-  inset: 0;
-  z-index: 30;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 18px;
-  background: rgba(0,0,0,.78);
-  backdrop-filter: blur(8px);
-}
-
-.modal.open { display: flex; }
-
-.modal-box {
-  width: 100%;
-  max-width: 490px;
-  background: #101b30;
-  border: 1px solid rgba(38,186,255,.4);
-  border-radius: 14px;
-  overflow: hidden;
-  box-shadow: 0 20px 80px rgba(0,0,0,.6);
-  animation: appear .2s ease;
-}
-
-@keyframes appear {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.modal-art {
-  height: 160px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(135deg, #075078, #101b30);
-}
-
-.modal-art span {
-  font-family: Orbitron, sans-serif;
-  font-size: 35px;
-  color: white;
-  text-shadow: 0 0 25px var(--cyan);
-}
-
-.modal-content { padding: 22px; }
-
-.modal-content h2 { font-size: 22px; }
-
-.modal-content p {
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.8;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.close {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: white;
-  padding: 10px 16px;
-  border-radius: 7px;
-}
-
-@media(max-width: 800px) {
-  .level-grid { grid-template-columns: repeat(2, 1fr); }
-  .info-grid { grid-template-columns: 1fr; }
-}
-
-@media(max-width: 560px) {
-  .nav { padding: 15px; }
-  .logo { font-size: 18px; }
-  .nav-links { gap: 12px; }
-  .nav-links a { font-size: 10px; }
-  .hero { padding-top: 70px; }
-  .stats { gap: 7px; }
-  .stat strong { font-size: 19px; }
-  .stat small { font-size: 8px; }
-  .filters { grid-template-columns: 1fr; }
-  .level-grid { grid-template-columns: 1fr; }
-  .section-heading { align-items: start; flex-direction: column; }
-}
 </style>
 </head>
-
 <body>
-
-<header>
-  <nav class="nav">
-    <div class="logo">DEMON<span>SCOPE</span></div>
-    <div class="nav-links">
-      <a href="#levels">LEVELS</a>
-      <a href="#about">ABOUT</a>
-      <a href="#how">HOW IT WORKS</a>
-    </div>
-  </nav>
-</header>
-
-<main>
-  <section class="hero">
-    <div class="tag">THE GEOMETRY DASH LEVEL EXPLORER</div>
-    <h1>ENTER THE <span>DEMON</span><br>ZONE.</h1>
-    <p>
-      Discover levels, explore difficulties and find your next challenge.
-      Welcome to DemonScope, your gateway into the Geometry Dash universe.
-    </p>
-    <div class="hero-actions">
-      <a class="btn btn-primary" href="#levels">EXPLORE LEVELS ↗</a>
-      <a class="btn btn-secondary" href="#about">DISCOVER DEMONS</a>
-    </div>
-  </section>
-
-  <div class="stats">
-    <div class="stat">
-      <strong>∞</strong>
-      <small>LEVEL POSSIBILITIES</small>
-    </div>
-    <div class="stat">
-      <strong>10</strong>
-      <small>DIFFICULTY TIERS</small>
-    </div>
-    <div class="stat">
-      <strong>GD</strong>
-      <small>COMMUNITY POWERED</small>
-    </div>
+<header><div class="bar-in"><a class="logo" href="#top">Demon<b>Scope</b><small>SCAN. RANK. CONQUER.</small></a><nav><a href="#rankings">Rankings</a><a href="#players">Players</a><a class="creator-nav" href="#creatorHub">Creators</a><a href="#achievements">Achievements</a><a href="#levelRequest">Level Request</a></nav></div></header>
+<main id="top">
+  <div class="hero">
+    <div class="eyebrow">THE COMMUNITY HUB FOR GEOMETRY DASH</div><h1>Every demon, ranked <em>Easy to Extreme</em></h1>
+    <p class="lede">Scan the lists. Track the players. Discover the creators. Welcome to DemonScope — a community hub built for every part of Geometry Dash.</p>
+    <p class="note">Extreme tier contains an unverified starter list for browsing practice. Other tiers are not populated yet. Category ratings are community-submitted locally in this prototype; they are not yet shared server-side.</p>
+    <div class="tiers" id="tiers"></div>
   </div>
 
-  <section class="content" id="levels">
-    <div class="section-heading">
-      <div>
-        <div class="eyebrow">THE LEVEL DATABASE</div>
-        <h2>EXPLORE LEVELS</h2>
-      </div>
-      <p>Find your next challenge.</p>
-    </div>
+  <div class="controls" id="rankings">
+    <div class="row2"><input id="q" type="search" placeholder="Search levels or creators" aria-label="Search levels or creators"><select id="mode" aria-label="Gamemode"></select></div>
+        <div class="row2 tabs" id="tabs" role="group" aria-label="Ranking category"></div>
+  </div>
+  <p id="blurb"></p>
+  <p id="count"></p>
+  <ol id="list"></ol>
+  <div class="pager" id="pager"></div>
 
-    <div class="filters">
-      <input id="search" type="search" placeholder="Search levels or creators...">
 
-      <select id="difficulty">
-        <option value="all">All difficulties</option>
-        <option value="Easy Demon">Easy Demon</option>
-        <option value="Medium Demon">Medium Demon</option>
-        <option value="Hard Demon">Hard Demon</option>
-        <option value="Insane Demon">Insane Demon</option>
-        <option value="Extreme Demon">Extreme Demon</option>
+  <section id="players">
+    <h2>AREDL Player Leaderboard</h2>
+    <p class="players-intro">Attempts to load real player rankings and points from AREDL. A successful live fetch is not guaranteed; if unavailable, the table stays empty rather than using fake data.</p>
+    <div class="player-controls">
+      <select id="playerSort" aria-label="Leaderboard view">
+        <option value="rank">AREDL global ranking</option>
+        <option value="points">Highest AREDL points</option>
       </select>
-
-      <select id="length">
-        <option value="all">All lengths</option>
-        <option value="Short">Short</option>
-        <option value="Medium">Medium</option>
-        <option value="Long">Long</option>
-        <option value="XL">XL</option>
-      </select>
+      <span class="player-badge">Live source · Top 10</span>
+      <button id="playerRefresh" type="button">Refresh now</button>
+      <span id="playerUpdateStatus" class="player-mini" aria-live="polite">Connecting to AREDL…</span>
     </div>
-
-    <div class="level-grid" id="levelGrid"></div>
-
-    <div class="empty" id="empty">
-      <h3>NO LEVELS FOUND</h3>
-      <p>Try another search or change your filters.</p>
+    <div class="player-table-wrap">
+      <table class="player-table">
+        <thead><tr><th>AREDL Rank</th><th>Player</th><th>Points</th><th>Source</th></tr></thead>
+        <tbody id="playerRows"><tr><td colspan="4">Loading verified leaderboard data…</td></tr></tbody>
+      </table>
     </div>
+    <p class="player-notice"><strong>Live data:</strong> Player names, ranks, and points come from AREDL. DemonScope refreshes its data on a reasonable interval (60 seconds) and updates the refresh timer every second. This page cannot make the upstream source update faster than it does. If the API or browser access fails, it shows an error/last successful data instead of fabricating players or scores.</p>
+  </section>
 
-    <div class="notice">
-      <strong>Database notice:</strong> The levels currently displayed are starter examples.
-      Their creator details, difficulty labels and length categories should be checked
-      before treating them as verified database information.
+
+  <section id="creatorHub">
+    <h2 class="creator-hub-title">Global Creators Hub</h2>
+    <p class="creator-intro">A discovery-space concept for creators of every size. Directory entries are demo data and are not verified or live.</p>
+    <div class="hub-grid">
+      <article class="hub-card spotlight"><div class="section-kicker">Community spotlight · demo</div><h3>Creator Spotlight</h3><p>Highlight creators for originality, style, community contribution, or a level that deserves more eyes.</p><a href="#creatorDirectory" style="color:#ffb547">Discover creators ↓</a></article>
+      <article class="hub-card"><div class="section-kicker">Explore</div><h3>Creator Directory</h3><p>Search names, browse new and rising creators, and open creator profile cards.</p><a href="#creatorDirectory">Browse directory ↓</a></article>
+      <article class="hub-card"><div class="section-kicker">Find your vibe</div><h3>Creator Styles</h3><p>Discover creators through decoration, gameplay, flow, challenge, memory, and experimental styles.</p><a href="#creatorStyles">Explore styles ↓</a></article>
+    </div>
+    <div id="creatorDirectory" class="subsection">
+      <h2 class="creator-hub-title">Explore Creators</h2>
+      <div class="directory-tools"><input id="directorySearch" type="search" placeholder="Search creators or creations" aria-label="Search creator directory"><button type="button" class="dir-filter" data-filter="all" aria-pressed="true">All</button><button type="button" class="dir-filter" data-filter="featured" aria-pressed="false">Featured</button><button type="button" class="dir-filter" data-filter="rising" aria-pressed="false">Rising</button><button type="button" class="dir-filter" data-filter="new" aria-pressed="false">New</button></div>
+      <div id="creatorDirectoryCards" class="creator-directory"></div>
+      <p class="player-notice" style="border-color:#76501e">Directory sample entries are illustrative. A real creator directory should be open to all and sourced from verifiable public accounts/level data.</p>
+    </div>
+    <div id="creatorStyles" class="subsection"><h2 class="creator-hub-title">Creator Styles</h2><div class="creator-style-grid"><div class="style-chip"><strong>Decoration & Visuals</strong><span>Atmosphere, art, effects, color, readability</span></div><div class="style-chip"><strong>Gameplay & Flow</strong><span>Movement, pacing, transitions, satisfying layouts</span></div><div class="style-chip"><strong>Challenge</strong><span>Precision, difficulty, skill expression</span></div><div class="style-chip"><strong>Memory & Learnability</strong><span>Patterns, routes, visual cues, memorization</span></div><div class="style-chip"><strong>Experimental</strong><span>New mechanics, unusual ideas, fresh concepts</span></div></div></div>
+    <div id="achievements" class="subsection"><h2 class="creator-hub-title">Creator Achievements</h2><div class="achievement-grid"><div class="achievement-card"><strong>First Creation</strong><p>Celebrate publishing a first level.</p></div><div class="achievement-card"><strong>Rising Creator</strong><p>Recognition for a creator gaining community attention.</p></div><div class="achievement-card"><strong>Versatile Creator</strong><p>Explore and build across multiple styles.</p></div><div class="achievement-card"><strong>Extreme Creator</strong><p>A level earns a verified Extreme Demon placement.</p></div><div class="achievement-card"><strong>Decoration Master</strong><p>Recognized for standout visual craft.</p></div><div class="achievement-card"><strong>Gameplay Innovator</strong><p>Recognized for distinctive mechanics or gameplay design.</p></div><div class="achievement-card"><strong>Community Spotlight</strong><p>Featured for contribution, originality, or a level deserving discovery.</p></div><div class="achievement-card"><strong>Milestones</strong><p>5, 10, 25, and 50 published levels—celebrate the journey.</p></div></div></div>
+  </section>
+
+  <section id="creators">
+    <h2 style="color:#ffb547">Creator Leaderboard · Demo</h2>
+    <p class="creator-intro">Illustrative interface only. Creator ranking and profile records are not verified or live. Click a creator to explore the sample profile layout.</p>
+    <div class="creator-controls"><input id="creatorSearch" type="search" placeholder="Search creators" aria-label="Search creators"><select id="creatorSort" aria-label="Sort creator rankings"><option value="score">Creator points</option><option value="extremes">Extreme demons created</option><option value="levels">Ranked levels</option><option value="hardest">Hardest creation</option></select><span class="creator-badge">Creator leaderboard</span></div>
+    <div class="creator-wrap"><table class="creator-table"><thead><tr><th>Rank</th><th>Creator</th><th>Ranked levels</th><th>Extremes</th><th>Hardest creation</th><th>Points</th></tr></thead><tbody id="creatorRows"></tbody></table></div>
+    <p class="player-notice" style="border-color:#76501e"><strong>Sample data:</strong> Creator names and figures below are illustrative placeholders, not official GD creator statistics. A real leaderboard needs a maintained, verified source.</p>
+  </section>
+
+  <section id="ratings">
+    <h2>How levels are rated</h2>
+    <div class="defs">
+      <div class="def"><h3>Difficulty</h3><p>Overall difficulty from 1 to 10. Easy sits near the bottom, Extreme near the top.</p></div>
+      <div class="def"><h3>Decoration</h3><p>Visual quality: effects, color use, and how readable the level stays.</p></div>
+      <div class="def"><h3>Length</h3><p>Time for one full run, shown in minutes and seconds.</p></div>
+      <div class="def"><h3>Gameplay</h3><p>How fun, original, and well-flowing the layout is.</p></div>
+      <div class="def"><h3>Nerve</h3><p>How much composure the level demands, especially near the end.</p></div>
+      <div class="def"><h3>Memory</h3><p>How much you must learn: hidden objects and parts you can’t react to.</p></div>
     </div>
   </section>
 
-  <section class="content" id="about">
-    <div class="eyebrow">WHAT IS DEMONSCOPE?</div>
-    <h2>MORE THAN JUST A GAME.</h2>
-
-    <div class="info-grid">
-      <div class="info-card">
-        <div class="symbol">◈</div>
-        <h3>DISCOVER</h3>
-        <p>Explore Geometry Dash levels and discover challenges across different demon difficulties.</p>
-      </div>
-
-      <div class="info-card">
-        <div class="symbol">⌕</div>
-        <h3>SEARCH</h3>
-        <p>Use the search bar and filters to narrow down your choices by difficulty and level length.</p>
-      </div>
-
-      <div class="info-card">
-        <div class="symbol">▣</div>
-        <h3>SHOWCASE</h3>
-        <p>Open a level card to view its showcase information in a dedicated popup.</p>
-      </div>
-    </div>
+  <section id="levelRequest">
+    <h2>Level Request</h2>
+    <p class="lede">Request a level to be added, suggest a correction, or nominate a level for a category review. Submitting opens your email app with the request addressed to DemonScope. No request is sent unless you complete sending in your email app.</p>
+    <form class="request-form" id="levelRequestForm">
+      <label>Level name<input id="requestLevelName" name="level" required placeholder="Level name"></label>
+      <label>Creator name<input name="creator" required placeholder="Creator username"></label>
+      <label>Level ID (if known)<input name="levelid" placeholder="Optional level ID"></label>
+      <label>Request type<select name="type"><option>Request level listing</option><option>Correct level information</option><option>Suggest category rating review</option><option>Creator / level spotlight nomination</option></select></label>
+      <label>Details<textarea name="details" rows="4" placeholder="Share the level link, gameplay showcase, evidence, or why you recommend it."></textarea></label>
+      <button type="submit" class="request-submit">Send level request via email</button>
+      <p class="request-hint">Email destination: karishameel@gmail.com. This form uses a mailto link and depends on your device having an email app configured; it does not send silently from the website.</p>
+    </form>
   </section>
 
-  <section class="content" id="how">
-    <div class="eyebrow">GETTING STARTED</div>
-    <h2>HOW IT WORKS</h2>
-    <div class="notice">
-      <strong>01 — Search:</strong> Enter a level name or creator.<br>
-      <strong>02 — Filter:</strong> Choose a demon difficulty or length.<br>
-      <strong>03 — Explore:</strong> Click any level card to open its showcase.<br>
-      <strong>04 — Discover:</strong> Find your next Geometry Dash challenge.
-    </div>
-  </section>
-</main>
-
-<div class="modal" id="levelModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-  <div class="modal-box">
-    <div class="modal-art">
-      <span>DEMONSCOPE</span>
-    </div>
-    <div class="modal-content">
-      <div class="eyebrow">LEVEL SHOWCASE</div>
-      <h2 id="modalTitle">Level name</h2>
-      <p id="modalDescription"></p>
-      <div class="card-meta" id="modalMeta"></div>
-      <div class="modal-actions">
-        <button class="close" id="closeModal">CLOSE</button>
-        <a class="btn btn-primary" href="https://www.robtopgames.com/" target="_blank" rel="noopener">GEOMETRY DASH ↗</a>
-      </div>
-    </div>
+<div class="player-modal" id="playerModal" role="dialog" aria-modal="true" aria-labelledby="playerModalTitle">
+  <div class="player-modal-card">
+    <div class="player-modal-head"><div><h3 id="playerModalTitle">Player profile</h3><div id="playerModalSubtitle" class="player-mini"></div></div><button class="player-modal-close" id="playerModalClose" type="button" aria-label="Close profile">✕</button></div>
+    <div class="player-profile-stats" id="playerProfileStats"></div>
+    <h4 class="player-profile-subtitle">Recent completions</h4><ul class="player-profile-list" id="playerRecent"></ul>
+    <h4 class="player-profile-subtitle">Recent achievements</h4><ul class="player-profile-list" id="playerAchievements"></ul>
+    <p class="player-notice">Profile details are illustrative sample content. A real player profile should link to the player's public account and completion evidence.</p>
   </div>
 </div>
 
-<footer>
-  <div class="logo">DEMON<span>SCOPE</span></div>
-  <p>Built for the Geometry Dash community.</p>
-  <p>Fan-made project. Not affiliated with RobTop Games.</p>
-  <strong>SMKBO11 © 2026</strong>
-</footer>
+
+<div class="creator-modal" id="creatorModal" role="dialog" aria-modal="true" aria-labelledby="creatorModalTitle"><div class="creator-card"><div class="creator-head"><div><h3 id="creatorModalTitle">Creator profile</h3><div id="creatorSubtitle" class="player-mini"></div></div><button id="creatorClose" type="button" aria-label="Close creator profile">✕</button></div><div class="creator-profile-stats" id="creatorProfileStats"></div><h4 class="creator-subtitle">Notable creations</h4><ul class="creator-list" id="creatorLevels"></ul><h4 class="creator-subtitle">Recent releases</h4><ul class="creator-list" id="creatorRecent"></ul><p class="player-notice" style="border-color:#76501e">Profile content is illustrative. Replace with sourced creator data.</p></div></div>
+
+</main>
+<footer>DemonScope is an independent fan-made project, not affiliated with RobTop Games. Extreme list entries and creator directory/leaderboard examples are unverified. Non-Extreme tiers are intentionally empty pending verified submissions. Local category ratings are saved only in your browser. Geometry Dash belongs to RobTop Games.</footer>
 
 <script>
-const levels = [
-  {
-    name: "Jawbreaker",
-    creator: "ZenthicAlpha",
-    difficulty: "Hard Demon",
-    length: "Long",
-    description: "A classic wave-focused demon challenge. A starter entry for the DemonScope showcase.",
-    color: "#174b83"
-  },
-  {
-    name: "Clubstep",
-    creator: "RobTop",
-    difficulty: "Easy Demon",
-    length: "Long",
-    description: "One of Geometry Dash's original official demon levels.",
-    color: "#8b292d"
-  },
-  {
-    name: "Theory of Everything 2",
-    creator: "RobTop",
-    difficulty: "Easy Demon",
-    length: "Long",
-    description: "An official demon level with a memorable soundtrack and varied gameplay.",
-    color: "#57338b"
-  }
+const M={d:['Difficulty','Hardest first. The main ranking of each top 50.'],dec:['Decoration','Community decoration score out of 10; unrated entries remain unscored.'],len:['Length','Longest runs first.'],gp:['Gameplay','Community gameplay score out of 10; unrated entries remain unscored.'],nv:['Nerve','Community nerve score out of 10; unrated entries remain unscored.'],mem:['Memory','Community memory score out of 10; unrated entries remain unscored.']};
+const T=[['Easy','#9dffc9',1,2],['Medium','#39ff88',2,4],['Hard','#2de2c8',4,6],['Insane','#38b6ff',6,8],['Extreme','#7b9bff',8,10]];
+const MODES=['Cube','Ship','Ball','UFO','Wave','Robot','Spider','Swing','Mixed'],PER=25,N=50;
+const L=[];
+// Non-Extreme tiers are intentionally empty until verified level data is added.
+const REAL=[["GRIEF", "icedcave"], ["Artemis 13", "Mvngo"], ["Society", "Neomarbilan"], ["Thinking Space II", "CairoX"], ["Amethyst", "iMist"], ["Flamewall", "Narwall"], ["Tidal Wave", "OniLink"], ["Green Bullet", "cherryteam"], ["ORBIT", "MindCap"], ["Antarctic Lights", "declanlc"], ["Nullscapes", "Kiba"], ["Quanteuse processing", "Renn241"], ["BOOBAWAMBA", "akunakun"], ["The Bloop", "murkkat"], ["Every End", "MindCap"], ["Ashley Wave Trials", "OddMod"], ["Silent clubstep", "Sailent"], ["Ultra Paracosm", "declan"], ["Penumbral", "Cherry Team"], ["andromeda", "insxne"], ["KILLSTEALER", "rynoxious"], ["Subsuming Vortex", "Cursed"], ["Anathema", "nikroplays"], ["Azure Flare", "ItsHybrid"], ["Defeated Circles", "GXQ"], ["Avernus", "PockeWindfish"], ["FOREST OF SPIKES", "bims"], ["Acheron", "ryamu"], ["Spectre", "xander"], ["Menace", "Arraegen"], ["Abyss of Darkness", "Exen"], ["Tunnel of Despair", "Exen"], ["Kyouki", "｛出見塩｝"], ["Sacrifice", "Laniakea"], ["Based After Based", "Akunakunn"], ["cognitohazard", "MercuryDT"], ["The Lightning Rod", "Lavatrex"], ["Maniacal Chains", "LordDivinity"], ["Thinking Space II", "CoCyMain"], ["Slaughterhouse", "icedcave"], ["Subterminal Point", "SyQual"], ["KOCMOC", "cherryteam"], ["BEING HOME", "Turtl123"], ["Deimos", "ItsHybrid"], ["CHIL", "McCoco"], ["zorin", "태리"], ["Prismline", "ItsHarryy"], ["BASSLINE JUNKIE", "MCBIGMACPLAYZ"], ["Sakupen Circles", "Diamond"], ["The Salt Factory", "Nickname09"]];
+REAL.forEach((r,i)=>L.push({n:r[0],c:r[1],t:'Extreme',p:i+1,m:null,d:null,dec:null,len:null,gp:null,nv:null,mem:null}));
+let key='d',tier='Extreme',mode='All',q='',page=1;
+const $=id=>document.getElementById(id);
+const tc=Object.fromEntries(T.map(t=>[t[0],t[1]]));
+const fmt=(k,v)=>k==='len'?Math.floor(v/60)+':'+String(v%60).padStart(2,'0'):k==='d'?v.toFixed(1):v+'/10';
+const btn=(t,on,fn)=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.setAttribute('aria-pressed',on);b.onclick=fn;return b};
+$('mode').innerHTML=['All gamemodes',...MODES].map((m,i)=>`<option value="${i?m:'All'}">${m}</option>`).join('');
+$('mode').onchange=e=>{mode=e.target.value;page=1;draw()};
+$('q').oninput=e=>{q=e.target.value.toLowerCase();page=1;draw()};
+function draw(){
+  $('tiers').replaceChildren(...T.slice().reverse().map(([n,c])=>{const b=document.createElement('button');b.type='button';b.className='tc'+(n===tier?' on':'');b.style.setProperty('--t',c);b.innerHTML=`<b>Top ${N}</b><span>${n} demons</span>`;b.onclick=()=>{tier=n;page=1;draw()};return b}));
+  $('tabs').replaceChildren(...Object.keys(M).map(k=>btn(M[k][0],k===key,()=>{key=k;page=1;draw()})));
+  $('blurb').textContent=M[key][1];
+  const rows=L.filter(x=>x.t===tier&&(mode==='All'||x.m===mode)&&(x.n+x.c).toLowerCase().includes(q)).sort((a,b)=>key==='d'?a.p-b.p:((b[key]??-1)-(a[key]??-1))||a.p-b.p);
+  const pages=Math.max(1,Math.ceil(rows.length/PER));page=Math.min(page,pages);
+  const off=(page-1)*PER,view=rows.slice(off,off+PER);
+  const max=Math.max(...rows.map(x=>x[key]??0),1);
+  $('count').textContent=rows.length?`Showing ${off+1}-${off+view.length} of ${rows.length} ${tier} demons`:'0 levels';
+  $('list').innerHTML=view.length?view.map((x,i)=>{const v=x[key],w=v==null?(key==='d'?(N-x.p+1)/N*100:0):key==='len'?v/max*100:v*10,shown=v==null?(key==='d'?'#'+x.p:'Not rated'):fmt(key,v);
+    return `<li class="item level-item" tabindex="0" role="button" aria-label="Open ${escapeHtml(x.n)} level showcase" data-level-index="${L.indexOf(x)}"><div class="rk">${off+i+1}</div><div><div class="nm">${escapeHtml(x.n)}</div><div class="meta"><span class="pill" style="--t:${tc[x.t]}">${x.t}</span>${x.m?`<span>${x.m}</span>`:''}<span>by ${escapeHtml(x.c)}</span>${key!=='d'?`<span>#${x.p} in difficulty</span>`:''}</div></div><div class="val">${shown}</div><div class="bar"><i style="width:${w}%"></i></div></li>`}).join(''):'<li class="empty">No levels match those filters.</li>';
+  const sel=document.createElement('select');sel.setAttribute('aria-label','Page');
+  for(let p=1;p<=pages;p++){const o=document.createElement('option');o.value=p;o.textContent='Page '+p+' of '+pages;sel.appendChild(o)}
+  sel.value=page;sel.onchange=()=>{page=+sel.value;draw();$('rankings').scrollIntoView()};
+  const prev=btn('Previous',false,()=>{page--;draw();$('rankings').scrollIntoView()}),next=btn('Next',false,()=>{page++;draw();$('rankings').scrollIntoView()});
+  prev.disabled=page<=1;next.disabled=page>=pages;
+  $('pager').replaceChildren(prev,sel,next);
+}
+draw();
+
+// Level showcase modal: clicking any list entry opens its details panel.
+function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+const levelModal=document.createElement('div');levelModal.className='level-modal';levelModal.id='levelModal';levelModal.setAttribute('role','dialog');levelModal.setAttribute('aria-modal','true');levelModal.innerHTML='<div class="level-modal-card"><button class="level-modal-close" type="button" aria-label="Close level showcase">✕</button><div id="levelShowcase"></div></div>';document.body.appendChild(levelModal);
+function showLevel(x){const rating=(k)=>x[k]==null?'Not rated':k==='len'?`${x[k]} seconds`:`${x[k]}/10`;const youtube=`https://www.youtube.com/results?search_query=${encodeURIComponent('Geometry Dash '+x.n+' showcase')}`;const content=$('levelShowcase');content.innerHTML=`<div class="level-kicker">DEMONSCOPE LEVEL SHOWCASE</div><h2>${escapeHtml(x.n)}</h2><p class="level-byline">Created by <strong>${escapeHtml(x.c)}</strong> · ${escapeHtml(x.t)} Demon · ${x.m||'Gamemode not listed'}</p><div class="level-preview"><div class="preview-icon">◈</div><div><strong>Level showcase</strong><p>Official gameplay preview is not embedded yet. Find available videos and showcases below.</p><a href="${youtube}" target="_blank" rel="noopener">Search gameplay showcase ↗</a></div></div><div class="level-stat-grid"><div><small>Difficulty placement</small><strong>#${x.p}</strong></div><div><small>Decoration</small><strong>${rating('dec')}</strong></div><div><small>Length</small><strong>${rating('len')}</strong></div><div><small>Gameplay</small><strong>${rating('gp')}</strong></div><div><small>Nerve</small><strong>${rating('nv')}</strong></div><div><small>Memory</small><strong>${rating('mem')}</strong></div></div><p class="level-modal-note">Official category ratings are not available yet. Use the local community rating widget below to record your own browser-only rating. Votes are not sent to a server or shared publicly.</p><div class="level-stat-grid" id="localRatingGrid"></div><div class="level-actions"><a class="level-action" href="${youtube}" target="_blank" rel="noopener">Find video showcase</a><button type="button" class="level-action request-this" data-name="${escapeHtml(x.n)}">Request / suggest this level</button></div>`;levelModal.classList.add('open');renderLocalRatings(x);content.querySelector('.request-this').addEventListener('click',()=>{levelModal.classList.remove('open');$('requestLevelName').value=x.n;$('levelRequest').scrollIntoView({behavior:'smooth'});});}
+$('list').addEventListener('click',e=>{const li=e.target.closest('[data-level-index]');if(li)showLevel(L[Number(li.dataset.levelIndex)]);});$('list').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-level-index]')){e.preventDefault();showLevel(L[Number(e.target.dataset.levelIndex)]);}});levelModal.querySelector('.level-modal-close').addEventListener('click',()=>levelModal.classList.remove('open'));levelModal.addEventListener('click',e=>{if(e.target===levelModal)levelModal.classList.remove('open')});document.addEventListener('keydown',e=>{if(e.key==='Escape')levelModal.classList.remove('open')});
+
+// Local-only category ratings: clearly marked as browser storage, not global votes.
+function renderLocalRatings(level){
+  const categories=[['dec','Decoration'],['gp','Gameplay'],['nv','Nerve'],['mem','Memory']];
+  const grid=$('localRatingGrid');
+  if(!grid)return;
+  const key='demonscope-local-ratings-v1-'+encodeURIComponent(level.n);
+  let saved={};try{saved=JSON.parse(localStorage.getItem(key)||'{}')}catch{}
+  grid.innerHTML=categories.map(([k,label])=>{
+    const avg=saved[k]?.score?Number(saved[k].score).toFixed(1):'—';
+    return `<div><small>${label} · this browser</small><strong>${avg}/10</strong><label style="display:block;margin-top:8px;color:var(--dim)">Your rating <select data-local-rate="${k}" aria-label="Rate ${label} from 1 to 10">${Array.from({length:10},(_,i)=>`<option value="${i+1}" ${Number(saved[k]?.mine)===i+1?'selected':''}>${i+1}/10</option>`).join('')}</select></label><button type="button" class="level-action" data-local-save="${k}" style="margin-top:8px">Save rating</button></div>`;
+  }).join('');
+  grid.querySelectorAll('[data-local-save]').forEach(btn=>btn.addEventListener('click',()=>{
+    const category=btn.dataset.localSave,select=grid.querySelector(`[data-local-rate="${category}"]`),rating=Number(select.value);
+    const previous=saved[category];
+    // One local vote per category per level, update it rather than accumulating repeated clicks.
+    const score=rating;
+    saved[category]={score,count:1,mine:rating};
+    try{localStorage.setItem(key,JSON.stringify(saved));renderLocalRatings(level)}catch{alert('Browser storage is unavailable. Your rating could not be saved.')}
+  }));
+}
+// Creators leaderboard: amber/gold theme, demo records only.
+const CREATORS=[
+{name:'icedcave',levels:14,extremes:11,hardest:'GRIEF',hardRank:1,score:9840,notable:['GRIEF','Slaughterhouse','KOCMOC'],recent:['GRIEF','New project (demo)'],badge:'Legendary creator'},
+{name:'MindCap',levels:12,extremes:9,hardest:'ORBIT',hardRank:5,score:8460,notable:['ORBIT','Every End','Nullscapes'],recent:['ORBIT','Community project (demo)'],badge:'Influential creator'},
+{name:'Cherry Team',levels:10,extremes:8,hardest:'KOCMOC',hardRank:3,score:7720,notable:['KOCMOC','Penumbral','The Bloop'],recent:['KOCMOC','Team showcase (demo)'],badge:'Team creator'},
+{name:'CairoX',levels:8,extremes:7,hardest:'Thinking Space II',hardRank:2,score:7110,notable:['Thinking Space II','Avernus'],recent:['Thinking Space II'],badge:'Top creator'},
+{name:'Neomarbilan',levels:7,extremes:6,hardest:'Society',hardRank:8,score:6420,notable:['Society','Anathema'],recent:['Society'],badge:'Top creator'},
+{name:'OniLink',levels:6,extremes:5,hardest:'Tidal Wave',hardRank:4,score:5910,notable:['Tidal Wave','Wave showcase'],recent:['Tidal Wave'],badge:'Featured creator'},
+{name:'PockeWindfish',levels:6,extremes:5,hardest:'Avernus',hardRank:6,score:5580,notable:['Avernus','Demon project'],recent:['Avernus'],badge:'Featured creator'},
+{name:'Exen',levels:5,extremes:4,hardest:'Tunnel of Despair',hardRank:9,score:4820,notable:['Tunnel of Despair','Abyss of Darkness'],recent:['Tunnel of Despair'],badge:'Featured creator'},
+{name:'Cherry',levels:4,extremes:3,hardest:'Penumbral',hardRank:11,score:3960,notable:['Penumbral','Team project'],recent:['Penumbral'],badge:'Rising creator'},
+{name:'Lavatrex',levels:4,extremes:3,hardest:'The Lightning Rod',hardRank:13,score:3440,notable:['The Lightning Rod','Creator showcase'],recent:['The Lightning Rod'],badge:'Rising creator'}
 ];
+const creatorRows=$('creatorRows'),creatorSort=$('creatorSort'),creatorSearch=$('creatorSearch'),creatorModal=$('creatorModal');
+function creatorRender(){let arr=CREATORS.slice();const term=creatorSearch.value.trim().toLowerCase();arr=arr.filter(c=>c.name.toLowerCase().includes(term));const sort=creatorSort.value;if(sort==='extremes')arr.sort((a,b)=>b.extremes-a.extremes);else if(sort==='levels')arr.sort((a,b)=>b.levels-a.levels);else if(sort==='hardest')arr.sort((a,b)=>a.hardRank-b.hardRank);else arr.sort((a,b)=>b.score-a.score);creatorRows.innerHTML=arr.map((c,i)=>`<tr><td><span class="creator-rank ${i===0?'c1':i===1?'c2':i===2?'c3':''}">#${i+1}</span></td><td><button class="creator-name" data-creator="${c.name}">${c.name}</button><div class="player-mini">${c.badge}</div></td><td>${c.levels}</td><td><span class="creator-stat">${c.extremes}</span></td><td class="creator-hardest">${c.hardest}</td><td><span class="creator-stat">${c.score.toLocaleString()}</span></td></tr>`).join('');creatorRows.querySelectorAll('[data-creator]').forEach(b=>b.addEventListener('click',()=>creatorOpen(CREATORS.find(c=>c.name===b.dataset.creator))));}
+function creatorOpen(c){if(!c)return;$('creatorModalTitle').textContent=c.name;$('creatorSubtitle').textContent=`Creator profile · ${c.badge}`;$('creatorProfileStats').innerHTML=`<div class="creator-profile-stat"><small>Ranked levels</small><strong>${c.levels}</strong></div><div class="creator-profile-stat"><small>Extreme demons</small><strong>${c.extremes}</strong></div><div class="creator-profile-stat"><small>Creator points</small><strong>${c.score.toLocaleString()}</strong></div><div class="creator-profile-stat"><small>Hardest creation</small><strong>${c.hardest}</strong></div><div class="creator-profile-stat"><small>Hardest rank</small><strong>#${c.hardRank}</strong></div><div class="creator-profile-stat"><small>Creator badge</small><strong>${c.badge}</strong></div>`;$('creatorLevels').innerHTML=c.notable.map(x=>`<li>${x}</li>`).join('');$('creatorRecent').innerHTML=c.recent.map(x=>`<li>${x}</li>`).join('');creatorModal.classList.add('open');}
 
-const grid = document.getElementById("levelGrid");
-const search = document.getElementById("search");
-const difficulty = document.getElementById("difficulty");
-const length = document.getElementById("length");
-const empty = document.getElementById("empty");
-const modal = document.getElementById("levelModal");
+// Creator discovery directory: sample records only, distinct from verified data.
+const directoryProfiles=CREATORS.map((c,i)=>({...c,kind:i===0||i===1||i===2?'featured':i>=8?'rising':'',style:['Decoration & Visuals','Gameplay & Flow','Challenge','Experimental'][i%4],newEntry:i>=8}));
+const dirSearch=$('directorySearch');let dirFilter='all';
+function directoryRender(){const term=dirSearch.value.trim().toLowerCase();let list=directoryProfiles.filter(c=>(c.name+' '+c.hardest+' '+c.notable.join(' ')+' '+c.style).toLowerCase().includes(term));if(dirFilter==='featured')list=list.filter(c=>c.kind==='featured');if(dirFilter==='rising')list=list.filter(c=>c.badge.toLowerCase().includes('rising'));if(dirFilter==='new')list=list.filter(c=>c.newEntry);$('creatorDirectoryCards').innerHTML=list.map(c=>`<article class="creator-tile" data-dircreator="${c.name}"><strong>${c.name}</strong><small>${c.badge} · ${c.style}</small><div class="tile-tags"><span class="creator-badge">${c.levels} ranked levels</span><span class="creator-badge">${c.extremes} Extremes</span></div><small>Hardest creation: ${c.hardest}</small></article>`).join('')||'<div class="empty">No creators match that search.</div>';document.querySelectorAll('[data-dircreator]').forEach(el=>el.addEventListener('click',()=>creatorOpen(CREATORS.find(c=>c.name===el.dataset.dircreator))));}
+dirSearch.addEventListener('input',directoryRender);document.querySelectorAll('.dir-filter').forEach(b=>b.addEventListener('click',()=>{dirFilter=b.dataset.filter;document.querySelectorAll('.dir-filter').forEach(x=>x.setAttribute('aria-pressed',x===b));directoryRender()}));
 
-function renderLevels() {
-  const term = search.value.toLowerCase().trim();
-  const selectedDifficulty = difficulty.value;
-  const selectedLength = length.value;
+creatorSort.addEventListener('change',creatorRender);creatorSearch.addEventListener('input',creatorRender);$('creatorClose').addEventListener('click',()=>creatorModal.classList.remove('open'));creatorModal.addEventListener('click',e=>{if(e.target===creatorModal)creatorModal.classList.remove('open')});document.addEventListener('keydown',e=>{if(e.key==='Escape')creatorModal.classList.remove('open')});creatorRender();directoryRender();
 
-  const filtered = levels.filter(level => {
-    const matchesSearch =
-      level.name.toLowerCase().includes(term) ||
-      level.creator.toLowerCase().includes(term);
-
-    const matchesDifficulty =
-      selectedDifficulty === "all" ||
-      level.difficulty === selectedDifficulty;
-
-    const matchesLength =
-      selectedLength === "all" ||
-      level.length === selectedLength;
-
-    return matchesSearch && matchesDifficulty && matchesLength;
-  });
-
-  grid.innerHTML = "";
-
-  filtered.forEach((level, index) => {
-    const card = document.createElement("article");
-    card.className = "level-card";
-    card.tabIndex = 0;
-    card.setAttribute("role", "button");
-    card.setAttribute("aria-label", "Open " + level.name + " showcase");
-
-    card.innerHTML = `
-      <div class="level-art" style="--art:${level.color}">
-        <span>LEVEL ${String(index + 1).padStart(2, "0")}</span>
-      </div>
-      <div class="card-body">
-        <div class="card-top">
-          <h3>${level.name}</h3>
-          <span class="difficulty">${level.difficulty}</span>
-        </div>
-        <div class="card-meta">
-          <span class="meta">◈ ${level.length}</span>
-          <span class="meta">Geometry Dash</span>
-        </div>
-        <div class="creator">CREATOR: ${level.creator}</div>
-        <div class="card-footer">
-          <span>LEVEL SHOWCASE</span>
-          <span class="view-link">VIEW DETAILS ↗</span>
-        </div>
-      </div>
-    `;
-
-    card.addEventListener("click", () => openShowcase(level));
-    card.addEventListener("keydown", event => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        openShowcase(level);
-      }
-    });
-
-    grid.appendChild(card);
-  });
-
-  empty.style.display = filtered.length ? "none" : "block";
+// Real player leaderboard from the public AREDL community data endpoint.
+// This is a browser-side fetch; if the source blocks cross-origin requests (CORS),
+// a small server-side proxy/cache will be needed. We never substitute fake players.
+const playerRows=$('playerRows'), playerSort=$('playerSort'), playerModal=$('playerModal');
+let livePlayers=[], lastSuccess=null, refreshBusy=false;
+const PLAYER_SOURCE='https://pb.aredl.com/api/leaderboard/';
+const PLAYER_REFRESH_MS=60*1000;
+let nextRefreshAt=Date.now()+PLAYER_REFRESH_MS;
+function renderLivePlayers(){
+  if(!livePlayers.length){
+    playerRows.innerHTML='<tr><td colspan="4">No verified leaderboard data loaded yet.</td></tr>';
+    return;
+  }
+  let arr=livePlayers.slice();
+  if(playerSort.value==='points') arr.sort((a,b)=>b.points-a.points);
+  else arr.sort((a,b)=>a.rank-b.rank);
+  playerRows.innerHTML=arr.slice(0,10).map((p,i)=>`<tr><td><span class="player-rank ${i===0?'top1':i===1?'top2':i===2?'top3':''}">#${p.rank}</span></td><td><strong>${escapePlayerText(p.name)}</strong><div class="player-mini">AREDL profile ID: ${escapePlayerText(String(p.id||'N/A'))}</div></td><td><span class="player-points">${Number(p.points).toLocaleString(undefined,{maximumFractionDigits:1})}</span></td><td><a href="https://aredl.net/leaderboard" target="_blank" rel="noopener noreferrer">AREDL ↗</a></td></tr>`).join('');
 }
-
-function openShowcase(level) {
-  document.getElementById("modalTitle").textContent = level.name;
-  document.getElementById("modalDescription").textContent = level.description;
-  document.getElementById("modalMeta").innerHTML = `
-    <span class="meta">Difficulty: ${level.difficulty}</span>
-    <span class="meta">Length: ${level.length}</span>
-    <span class="meta">Creator: ${level.creator}</span>
-  `;
-  modal.classList.add("open");
-  document.getElementById("closeModal").focus();
+function escapePlayerText(value){return String(value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+async function refreshPlayerData(){
+  if(refreshBusy)return;
+  refreshBusy=true;
+  const button=$('playerRefresh'),status=$('playerUpdateStatus');
+  button.disabled=true;
+  status.textContent='Fetching AREDL leaderboard…';
+  try{
+    const response=await fetch(PLAYER_SOURCE,{cache:'no-store'});
+    if(!response.ok)throw new Error('Source HTTP '+response.status);
+    const raw=await response.json();
+    if(!Array.isArray(raw))throw new Error('Unexpected API response');
+    const parsed=raw.map((row,index)=>({
+      rank:Number(row.rank)||index+1,
+      name:row?.user?.global_name||row?.user?.name||row?.user?.username||'Unknown player',
+      id:row?.user?.id||row?.user?.aredl_id||'',
+      points:Number(row.points)||0
+    })).filter(row=>row.name!=='Unknown player'&&Number.isFinite(row.points));
+    if(!parsed.length)throw new Error('No player records returned');
+    livePlayers=parsed;
+    lastSuccess=new Date();
+    renderLivePlayers();
+    status.textContent='Source updated '+lastSuccess.toLocaleTimeString()+' · next check in 60s';
+  }catch(error){
+    status.textContent=livePlayers.length?'Refresh failed · showing last successful data · '+error.message:'Could not connect to AREDL (CORS/network may block browser access). No sample players shown.';
+    if(!livePlayers.length)playerRows.innerHTML='<tr><td colspan="4">Live source unavailable. Try Refresh now, or host a backend proxy/cache to connect the source.</td></tr>';
+  }finally{
+    refreshBusy=false;button.disabled=false;nextRefreshAt=Date.now()+PLAYER_REFRESH_MS;
+  }
 }
+playerSort.addEventListener('change',renderLivePlayers);
+$('playerRefresh').addEventListener('click',refreshPlayerData);
+// Refresh data once a minute; a small status timer updates every second.
+refreshPlayerData();
+setInterval(()=>{
+  const status=$('playerUpdateStatus');
+  if(!refreshBusy && livePlayers.length){
+    const secs=Math.max(0,Math.ceil((nextRefreshAt-Date.now())/1000));
+    status.textContent='AREDL data · updated '+(lastSuccess?lastSuccess.toLocaleTimeString():'—')+' · next refresh in '+secs+'s';
+  }
+  if(Date.now()>=nextRefreshAt&&!refreshBusy)refreshPlayerData();
+},1000);
 
-function closeShowcase() {
-  modal.classList.remove("open");
-}
+$('levelRequestForm').addEventListener('submit',e=>{e.preventDefault();const f=e.currentTarget;const data=new FormData(f);const subject=`DemonScope Level Request: ${data.get('level')}`;const body=[`Level: ${data.get('level')}`,`Creator: ${data.get('creator')}`,`Level ID: ${data.get('levelid')||'Not provided'}`,`Request type: ${data.get('type')}`,`Details: ${data.get('details')||'No additional details'}`].join('\n');const url=`mailto:karishameel@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;window.location.href=url;});
 
-search.addEventListener("input", renderLevels);
-difficulty.addEventListener("change", renderLevels);
-length.addEventListener("change", renderLevels);
-document.getElementById("closeModal").addEventListener("click", closeShowcase);
-
-modal.addEventListener("click", event => {
-  if (event.target === modal) closeShowcase();
-});
-
-document.addEventListener("keydown", event => {
-  if (event.key === "Escape") closeShowcase();
-});
-
-renderLevels();
 </script>
-
 </body>
 </html>
